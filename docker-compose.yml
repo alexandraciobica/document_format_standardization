@@ -1,0 +1,32 @@
+version: '3'
+services:
+  app:
+    container_name: document-app-container  # This sets the container name
+    image: document-format-app  # The image you're using
+    ports:
+      - "8000:8000"  # Exposes port 8000 on the host to port 8000 in the container
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - ./backend:/app
+  #   environment:
+  #     - API_KEY=your_api_key_here
+
+
+
+
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./frontend:/app
