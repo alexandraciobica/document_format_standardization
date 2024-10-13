@@ -10,7 +10,9 @@ services:
     ports:
       - "8000:8000"  # Exposes port 8000 on the host to port 8000 in the container
     volumes:
-      - ./backend:/app # Mount the current directory to /app in the container
+      # - ./backend:/app # Mount the current directory to /app in the container
+      - ./backend/uploads:/app/uploads  # Persist uploads
+      - ./backend/processed:/app/processed  # Persist processed files
     networks:
       - app-network
  #   environment:
