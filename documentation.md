@@ -51,3 +51,32 @@ curl -L -X 'POST' \
   -F 'file=@example.txt'
 
 curl -L -X 'POST' 'http://127.0.0.1:8000/uploadfile/' -H 'accept: application/json' -H 'Content-Type: multipart/form-data' -F 'file=@example.txt'
+
+
+
+-------
+
+
+The errors I was getting in browser console:
+1. `Access to XMLHttpRequest at 'http://localhost:8000/uploadfile' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.`
+
+2. `There was an error uploading the files: Q {message: 'Network Error', name: 'AxiosError', code: 'ERR_NETWORK',`
+
+3. `POST http://localhost:8000/uploadfile net::ERR_FAILED 200 (OK)`
+
+What helped:
+1. Checking if the ports are visible for both frontend and backend
+2. Adding  CORS Middleware configuration to FastApi so that the file is sent successfully.
+
+`origins = [`
+    `"http://localhost:3000",  # Allow requests from the React frontend`
+    `# You can also allow more origins or use "*" to allow all origins`
+`]`
+
+`app.add_middleware(`
+    `CORSMiddleware,`
+    `allow_origins=origins,`
+    `allow_credentials=True,`
+    `allow_methods=["*"],  # Allow all HTTP methods`
+    `allow_headers=["*"],  # Allow all headers`
+`)`

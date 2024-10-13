@@ -31,3 +31,4 @@ def get_item(item_id: int) -> Item:
         return items[item_id]
     else:
         raise HTTPException(status_code=404, detail=f"Item id {item_id} not found")
+    

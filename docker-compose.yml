@@ -1,32 +1,37 @@
 version: '3'
 services:
-  app:
-    container_name: document-app-container  # This sets the container name
-    image: document-format-app  # The image you're using
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fastapi-backend  # This sets the container name
+    expose:
+      - "8000"
     ports:
       - "8000:8000"  # Exposes port 8000 on the host to port 8000 in the container
     volumes:
-      - .:/app  # Mount the current directory to /app in the container
-
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - ./backend:/app
-  #   environment:
+      - ./backend:/app # Mount the current directory to /app in the container
+    networks:
+      - app-network
+ #   environment:
   #     - API_KEY=your_api_key_here
 
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: react-frontend
+    expose:
+      - "3000"
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/app
+    networks:
+      - app-network
 
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./frontend:/app
+networks:
+  app-network:
+    driver: bridge
