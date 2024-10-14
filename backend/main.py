@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import json
+from bs4 import BeautifulSoup
+import markdownify
 import pymupdf4llm
 # import pathlib
 
@@ -27,6 +30,25 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
+#------------------- HTML from JSON
+#---------------------------------------------------------
+def extract_html_from_json(json_file_path):
+    with open(json_file_path, 'r') as file:
+        data = json.load(file)
+
+        html_content = data.get("body", {}).get("export_view", {}).get("value", "")
+        return html_content
+
+
+def html_to_markdown(html_content):
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    markdown_content = markdownify.markdownify(str(soup), heading_style="ATX")
+    return markdown_content
+
+
+#------------------- PDF
+#---------------------------------------------------------
 def parse_pdf_to_markdown(file_path: str) -> str:
     try:
         docs = pymupdf4llm.to_markdown(doc=file_path, 
@@ -61,6 +83,10 @@ def parse_document(file_path: str, file_extension: str) -> str:
 
     elif file_extension == '.pdf':
         content = parse_pdf_to_markdown(file_path)
+        return content
+    elif file_extension == '.json':
+        html_content = extract_html_from_json(file_path)
+        content = html_to_markdown(html_content)
         return content
     else: 
         raise ValueError("Unsuported file type")
@@ -104,4 +130,4 @@ async def upload_file(file: UploadFile = File(...)):
     os.remove(file_location)
     
     # Return a JSON response with the result
-    return JSONResponse(content={"markdown": parsed_content})
+    return JSONResponse(content={"markdown": parsed_content, "filename": file.filename})
